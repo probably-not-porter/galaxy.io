@@ -37,9 +37,39 @@ window.onload = function() {
         delete keysDown[e.keyCode];
     }, false);
 
+    var dragStart;
+    var dragEnd;
+
+    canvas.addEventListener('mousedown', function(event) {
+        console.log('test');
+        dragStart = {
+            x: event.pageX - canvas.offsetLeft,
+            y: event.pageY - canvas.offsetTop
+        }
+    });
+    canvas.addEventListener('mouseup', function(event) {
+        dragStart = null;
+    });
+
+    canvas.addEventListener('mousemove', function(event) {
+        console.log(dragStart);
+        if (dragStart) {
+            dragEnd = {
+                x: event.pageX - canvas.offsetLeft,
+                y: event.pageY - canvas.offsetTop
+            }
+            //ctx.translate((dragEnd.x - dragStart.x) / 20, (dragEnd.y - dragStart.y) / 20);
+            clear()
+        }
+    });
+    
+
     // Reset the game when the player catches a monster
     var reset = function () {
     };
+    function clear() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
 
     // Update game objects
     var update = function (modifier) {
@@ -47,9 +77,17 @@ window.onload = function() {
 
     // Draw everything
     var render = function () {
-
-        ctx.fillStyle = "blue";
+        // bg
+        ctx.fillStyle = "black";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // center
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2, canvas.height / 2, 20, 0, Math.PI*2);
+        ctx.fillStyle = "lightyellow";
+        ctx.fill();
+        ctx.closePath();
 
         // Score
         
