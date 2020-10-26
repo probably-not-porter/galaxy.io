@@ -70,6 +70,7 @@ window.onload = function() {
             let new_planet = {
                 x: Math.random()*canvas.width,
                 y: Math.random()*canvas.height,
+                path: [],
                 xvel: 0,
                 yvel: 0,
                 mass: Math.random()*100,
@@ -88,7 +89,7 @@ window.onload = function() {
         // Compute the distance of the other body.
         //sx, sy = self_x, self_y
         //ox, oy = screen_width / 2, screen_height / 2
-
+        20
         let dx = ((canvas.width / 2) - p.x)
         let dy = ((canvas.height / 2) - p.y)
         let d = Math.sqrt(dx**2 + dy**2)
@@ -106,6 +107,11 @@ window.onload = function() {
         let fy = Math.sin(theta) * force;
         p.xvel = (p.xvel + fx);
         p.yvel = (p.yvel + fy);
+
+        p.path.push([p.x, p.y]);
+        if (p.path.length > 100){
+            p.path.shift();
+        }
         p.x += p.xvel;
         p.y += p.yvel;
     }
@@ -134,12 +140,24 @@ window.onload = function() {
 
         // PLANETS
         for (x in planet_ls) {
+            // draw body
             ctx.fillStyle = planet_ls[x].color;
             ctx.beginPath();
             ctx.arc(planet_ls[x].x, planet_ls[x].y, planet_ls[x].size, 0, Math.PI*2);
             ctx.fillStyle = planet_ls[x].color;
             ctx.fill();
             ctx.closePath();
+
+            // draw path
+            ctx.strokeStyle = "lightyellow";
+            ctx.beginPath();
+            
+            //console.log(planet_ls[x].path)
+            ctx.moveTo(planet_ls[x].x, planet_ls[x].y);
+            for (let y = planet_ls[x].path.length - 1; y >= 0; y--){
+                ctx.lineTo(planet_ls[x].path[y][0], planet_ls[x].path[y][1]);
+            }
+            ctx.stroke();
         }
 
         // Score
