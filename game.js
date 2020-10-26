@@ -1,5 +1,6 @@
 window.onload = function() {
-    // Create the canvas
+
+    // ------------------ SET UP GAME AREA ------------------
     var canvas = document.createElement("canvas");
     var ctx = canvas.getContext("2d");
     canvas.width = window.innerWidth;
@@ -14,59 +15,70 @@ window.onload = function() {
     };
     bgImage.src = "images/background.png";
 
-    // Game objects
-    var hero = {
-        speed: 256, // movement in pixels per second
-        x: 0,
-        y: 0
-    };
-    var monster = {
-        x: 0,
-        y: 0
-    };
-    var monstersCaught = 0;
+    // ------------------------ VARS ------------------------
 
-    // Handle keyboard controls
-    var keysDown = {};
-
-    addEventListener("keydown", function (e) {
-        keysDown[e.keyCode] = true;
-    }, false);
-
-    addEventListener("keyup", function (e) {
-        delete keysDown[e.keyCode];
-    }, false);
-
+    // Movement related
+    var dragging = false;
     var dragStart;
     var dragEnd;
+    var dragVel;
+    var dragVelLast = {
+        x: 0,
+        y: 0
+    }
+
+    var planet_ls = []; // keep track of all existing planets
+    
+    // ------------------------ EVENTS ------------------------
 
     canvas.addEventListener('mousedown', function(event) {
-        console.log('test');
+        dragging = true;
         dragStart = {
             x: event.pageX - canvas.offsetLeft,
             y: event.pageY - canvas.offsetTop
         }
     });
     canvas.addEventListener('mouseup', function(event) {
-        dragStart = null;
+        dragging = false;
     });
 
     canvas.addEventListener('mousemove', function(event) {
-        console.log(dragStart);
-        if (dragStart) {
+        
+        if (dragging) {
             dragEnd = {
                 x: event.pageX - canvas.offsetLeft,
                 y: event.pageY - canvas.offsetTop
             }
-            //ctx.translate((dragEnd.x - dragStart.x) / 20, (dragEnd.y - dragStart.y) / 20);
-            clear()
+            dragVel = {
+                x: dragStart.x - dragEnd.x,
+                y: dragStart.y - dragEnd.y
+            }
+            console.log(dragVel.x - dragVelLast.x, dragVel.y - dragVelLast.y);
+            
+            // do stuff in here
+
+            dragVelLast = dragVel;
         }
     });
     
+    // ------------------------ GAME FUNCTIONS ------------------------
+    function genPlanets(n){
+        for (let x = 0; x < n; x++){
+            let new_planet = {
+                x: Math.random()*canvas.width,
+                y: Math.random()*canvas.height,
+                xvel: 0,
+                yvel: 0,
+                mass: Math.random()*10,
+                size: Math.random()*8,
+                color: 'white'
+            };
+            planet_ls.push(new_planet)
+            console.log(planet_ls);
+        }
+    }
+    // ------------------------ UTIL FUNCTIONS ------------------------
 
-    // Reset the game when the player catches a monster
-    var reset = function () {
-    };
     function clear() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
@@ -81,13 +93,22 @@ window.onload = function() {
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // center
-        ctx.fillStyle = "white";
+        // SUN
         ctx.beginPath();
         ctx.arc(canvas.width / 2, canvas.height / 2, 20, 0, Math.PI*2);
         ctx.fillStyle = "lightyellow";
         ctx.fill();
         ctx.closePath();
+
+        // PLANETS
+        for (x in planet_ls) {
+            ctx.fillStyle = planet_ls[x].color;
+            ctx.beginPath();
+            ctx.arc(planet_ls[x].x, planet_ls[x].y, planet_ls[x].size, 0, Math.PI*2);
+            ctx.fillStyle = planet_ls[x].color;
+            ctx.fill();
+            ctx.closePath();
+        }
 
         // Score
         
@@ -95,10 +116,9 @@ window.onload = function() {
         ctx.font = "24px Helvetica";
         ctx.textAlign = "left";
         ctx.textBaseline = "top";
-        ctx.fillText("Monsters caught: " + monstersCaught, 32, 32);
     };
 
-    // The main game loop
+    // ------------------------ MAIN LOOP ------------------------
     var main = function () {
         var now = Date.now();
         var delta = now - then;
@@ -114,6 +134,6 @@ window.onload = function() {
 
     // Let's play this game!
     var then = Date.now();
-    reset();
+    genPlanets(30);
     main();
 }
