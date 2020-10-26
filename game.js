@@ -55,7 +55,10 @@ window.onload = function() {
             }
             console.log(dragVel.x - dragVelLast.x, dragVel.y - dragVelLast.y);
             
-            // do stuff in here
+            for (x in planet_ls){
+                planet_ls[x].x -= (dragVel.x) / 20
+                planet_ls[x].y -= (dragVel.y) / 20
+            }
 
             dragVelLast = dragVel;
         }
@@ -69,13 +72,42 @@ window.onload = function() {
                 y: Math.random()*canvas.height,
                 xvel: 0,
                 yvel: 0,
-                mass: Math.random()*10,
+                mass: Math.random()*100,
                 size: Math.random()*8,
                 color: 'white'
             };
             planet_ls.push(new_planet)
             console.log(planet_ls);
         }
+    }
+    function movePlanet(p){
+        let dist = Math.sqrt( Math.abs(p.x - canvas.width / 2)**2 + Math.abs(p.y - canvas.height / 2)**2);
+        let dist_y = Math.abs(p.y - canvas.height / 2);
+        let dist_x = Math.abs(p.x - canvas.width / 2);
+
+        // Compute the distance of the other body.
+        //sx, sy = self_x, self_y
+        //ox, oy = screen_width / 2, screen_height / 2
+
+        let dx = ((canvas.width / 2) - p.x)
+        let dy = ((canvas.height / 2) - p.y)
+        let d = Math.sqrt(dx**2 + dy**2)
+
+        if (d == 0){
+            console.error('collision');
+        }
+
+        // Compute the force of attraction
+        let force = 9.8 * 1 * p.mass * 1 / (d**2)
+
+        // Compute the direction of the force.
+        let theta = Math.atan2(dy, dx);
+        let fx = Math.cos(theta) * force;
+        let fy = Math.sin(theta) * force;
+        p.xvel = (p.xvel + fx);
+        p.yvel = (p.yvel + fy);
+        p.x += p.xvel;
+        p.y += p.yvel;
     }
     // ------------------------ UTIL FUNCTIONS ------------------------
 
@@ -124,6 +156,9 @@ window.onload = function() {
         var delta = now - then;
 
         update(delta / 1000);
+        for (x in planet_ls){
+            movePlanet(planet_ls[x]);
+        }
         render();
 
         then = now;
