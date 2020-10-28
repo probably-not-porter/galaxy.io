@@ -18,6 +18,13 @@ window.onload = function() {
     // ------------------------ VARS ------------------------
 
     // Movement related
+    var speed = 10;
+    var skew = {
+        left: false,
+        right: false,
+        up: false,
+        down: false
+    };
     var dragging = false;
     var dragStart;
     var dragEnd;
@@ -30,41 +37,69 @@ window.onload = function() {
     var planet_ls = []; // keep track of all existing planets
     
     // ------------------------ EVENTS ------------------------
-
-    canvas.addEventListener('mousedown', function(event) {
-        dragging = true;
-        dragStart = {
-            x: event.pageX - canvas.offsetLeft,
-            y: event.pageY - canvas.offsetTop
+    document.addEventListener('keydown', function(event) {
+        if (event.keyCode == '40') {
+            skew.down = true;
         }
-    });
-    canvas.addEventListener('mouseup', function(event) {
-        dragging = false;
-    });
-
-    canvas.addEventListener('mousemove', function(event) {
-        
-        if (dragging) {
-            dragEnd = {
-                x: event.pageX - canvas.offsetLeft,
-                y: event.pageY - canvas.offsetTop
-            }
-            dragVel = {
-                x: dragStart.x - dragEnd.x,
-                y: dragStart.y - dragEnd.y
-            }
-            console.log(dragVel.x - dragVelLast.x, dragVel.y - dragVelLast.y);
-            
-            for (x in planet_ls){
-                planet_ls[x].x -= (dragVel.x) / 20
-                planet_ls[x].y -= (dragVel.y) / 20
-            }
-
-            dragVelLast = dragVel;
+        if (event.keyCode == '38') {
+            skew.up = true;
         }
-    });
-    
+        if (event.keyCode == '39') {
+            skew.right = true;
+        }
+        if (event.keyCode == '37') {
+            skew.left = true;
+        }
+    }, false);
+
+    document.addEventListener('keyup', function(event) {
+        if (event.keyCode == '40') {
+            skew.down = false;
+        }
+        if (event.keyCode == '38') {
+            skew.up = false;
+        }
+        if (event.keyCode == '39') {
+            skew.right = false;
+        }
+        if (event.keyCode == '37') {
+            skew.left = false;
+        }
+    }, false);
+
     // ------------------------ GAME FUNCTIONS ------------------------
+    function skewLeft(){
+        for (x in planet_ls){
+            planet_ls[x].x += speed;
+            for (y in planet_ls[x].path){
+                planet_ls[x].path[y][0] += speed;
+            }
+        }
+    }
+    function skewRight(){
+        for (x in planet_ls){
+            planet_ls[x].x -= speed;
+            for (y in planet_ls[x].path){
+                planet_ls[x].path[y][0] -= speed;
+            }
+        }
+    }
+    function skewUp(){
+        for (x in planet_ls){
+            planet_ls[x].y += speed;
+            for (y in planet_ls[x].path){
+                planet_ls[x].path[y][1] += speed;
+            }
+        }
+    }
+    function skewDown(){
+        for (x in planet_ls){
+            planet_ls[x].y -= speed;
+            for (y in planet_ls[x].path){
+                planet_ls[x].path[y][1] -= speed;
+            }
+        }
+    }
     function genPlanets(n){
         for (let x = 0; x < n; x++){
             let new_planet = {
@@ -174,9 +209,17 @@ window.onload = function() {
         var delta = now - then;
 
         update(delta / 1000);
-        for (x in planet_ls){
+
+        if (skew.up) skewUp();
+        if (skew.down) skewDown();
+        if (skew.left) skewLeft();
+        if (skew.right) skewRight();
+
+        for (x in planet_ls){ // update planet positions
             movePlanet(planet_ls[x]);
         }
+
+
         render();
 
         then = now;
