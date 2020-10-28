@@ -25,14 +25,10 @@ window.onload = function() {
         up: false,
         down: false
     };
-    var dragging = false;
-    var dragStart;
-    var dragEnd;
-    var dragVel;
-    var dragVelLast = {
+    var pos = {
         x: 0,
         y: 0
-    }
+    };
 
     var planet_ls = []; // keep track of all existing planets
     
@@ -69,6 +65,7 @@ window.onload = function() {
 
     // ------------------------ GAME FUNCTIONS ------------------------
     function skewLeft(){
+        pos.x -= speed;
         for (x in planet_ls){
             planet_ls[x].x += speed;
             for (y in planet_ls[x].path){
@@ -77,6 +74,7 @@ window.onload = function() {
         }
     }
     function skewRight(){
+        pos.x += speed;
         for (x in planet_ls){
             planet_ls[x].x -= speed;
             for (y in planet_ls[x].path){
@@ -85,6 +83,7 @@ window.onload = function() {
         }
     }
     function skewUp(){
+        pos.y -= speed;
         for (x in planet_ls){
             planet_ls[x].y += speed;
             for (y in planet_ls[x].path){
@@ -93,6 +92,7 @@ window.onload = function() {
         }
     }
     function skewDown(){
+        pos.y += speed;
         for (x in planet_ls){
             planet_ls[x].y -= speed;
             for (y in planet_ls[x].path){
@@ -197,10 +197,11 @@ window.onload = function() {
 
         // Score
         
-        ctx.fillStyle = "rgb(250, 250, 250)";
-        ctx.font = "24px Helvetica";
+        ctx.fillStyle = "white";
+        ctx.font = "18px Helvetica";
         ctx.textAlign = "left";
         ctx.textBaseline = "top";
+        ctx.fillText("X: " + pos.x + ", Y: " + pos.y, 10, 10); 
     };
 
     // ------------------------ MAIN LOOP ------------------------
