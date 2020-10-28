@@ -30,6 +30,8 @@ window.onload = function() {
         y: 0
     };
 
+    var trail_max = 100;
+
     var planet_ls = []; // keep track of all existing planets
     
     // ------------------------ EVENTS ------------------------
@@ -106,8 +108,8 @@ window.onload = function() {
                 x: Math.random()*canvas.width,
                 y: Math.random()*canvas.height,
                 path: [],
-                xvel: 0,
-                yvel: 0,
+                xvel: Math.random()*1 - 0.5,
+                yvel: Math.random()*1 - 0.5,
                 mass: Math.random()*100,
                 size: Math.random()*8,
                 color: 'white'
@@ -144,7 +146,7 @@ window.onload = function() {
         p.yvel = (p.yvel + fy);
 
         p.path.push([p.x, p.y]);
-        if (p.path.length > 100){
+        if (p.path.length > trail_max){
             p.path.shift();
         }
         p.x += p.xvel;
@@ -184,15 +186,17 @@ window.onload = function() {
             ctx.closePath();
 
             // draw path
-            ctx.strokeStyle = "lightyellow";
-            ctx.beginPath();
             
-            //console.log(planet_ls[x].path)
-            ctx.moveTo(planet_ls[x].x, planet_ls[x].y);
-            for (let y = planet_ls[x].path.length - 1; y >= 0; y--){
+            
+            for (let y = planet_ls[x].path.length - 2; y >= 0; y--){
+                ctx.strokeStyle = 'rgba(255, 255, 255, ' + (y / planet_ls[x].path.length / 2) + ')';
+                ctx.lineWidth = (y / planet_ls[x].path.length)*planet_ls[x].size*2;
+                ctx.beginPath();
+                ctx.moveTo(planet_ls[x].path[y+1][0], planet_ls[x].path[y+1][1]);
                 ctx.lineTo(planet_ls[x].path[y][0], planet_ls[x].path[y][1]);
+                ctx.stroke();
             }
-            ctx.stroke();
+            
         }
 
         // Score
