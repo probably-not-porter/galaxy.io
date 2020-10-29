@@ -33,6 +33,8 @@ window.onload = function() {
     var trail_max = 100;
 
     var planet_ls = []; // keep track of all existing planets
+    var bg_layer1 = []; // keep track of all background stars
+    var bg_layer2 = []; // keep track of all background stars
     
     // ------------------------ EVENTS ------------------------
     document.addEventListener('keydown', function(event) {
@@ -74,6 +76,12 @@ window.onload = function() {
                 planet_ls[x].path[y][0] += speed;
             }
         }
+        for (x in bg_layer1){
+            bg_layer1[x].x += speed / 2;
+        }
+        for (x in bg_layer2){
+            bg_layer2[x].x += speed / 4;
+        }
     }
     function skewRight(){
         pos.x += speed;
@@ -82,6 +90,12 @@ window.onload = function() {
             for (y in planet_ls[x].path){
                 planet_ls[x].path[y][0] -= speed;
             }
+        }
+        for (x in bg_layer1){
+            bg_layer1[x].x -= speed / 2;
+        }
+        for (x in bg_layer2){
+            bg_layer2[x].x -= speed / 4;
         }
     }
     function skewUp(){
@@ -92,6 +106,12 @@ window.onload = function() {
                 planet_ls[x].path[y][1] += speed;
             }
         }
+        for (x in bg_layer1){
+            bg_layer1[x].y += speed / 2;
+        }
+        for (x in bg_layer2){
+            bg_layer2[x].y += speed / 4;
+        }
     }
     function skewDown(){
         pos.y += speed;
@@ -100,6 +120,32 @@ window.onload = function() {
             for (y in planet_ls[x].path){
                 planet_ls[x].path[y][1] -= speed;
             }
+        }
+        for (x in bg_layer1){
+            bg_layer1[x].y -= speed / 2;
+        }
+        for (x in bg_layer2){
+            bg_layer2[x].y -= speed / 4;
+        }
+    }
+    function genBG(n){
+        for (let x = 0; x < n; x++){
+            let new_star = {
+                x: Math.random()*canvas.width*10 - canvas.width*5,
+                y: Math.random()*canvas.height*10 - canvas.height*5,
+                size: 2,
+                color: "rgba(255,255,255,0.8)"
+            };
+            bg_layer1.push(new_star)
+        }
+        for (let x = 0; x < n; x++){
+            let new_star = {
+                x: Math.random()*canvas.width*10 - canvas.width*5,
+                y: Math.random()*canvas.height*10 - canvas.height*5,
+                size: 1,
+                color: "rgba(255,255,255,0.5)"
+            };
+            bg_layer2.push(new_star)
         }
     }
     function genPlanets(n){
@@ -112,10 +158,9 @@ window.onload = function() {
                 yvel: Math.random()*1 - 0.5,
                 mass: Math.random()*100,
                 size: Math.random()*8,
-                color: 'white'
+                color: planetColor()
             };
             planet_ls.push(new_planet)
-            console.log(planet_ls);
         }
     }
     function movePlanet(p){
@@ -153,7 +198,14 @@ window.onload = function() {
         p.y += p.yvel;
     }
     // ------------------------ UTIL FUNCTIONS ------------------------
-
+    function planetColor(){
+        let color = "rgb(";
+        color += Math.floor(Math.random()*255) + ", ";
+        color += Math.floor(Math.random()*255) + ", ";
+        color += Math.floor(Math.random()*155 + 100) + ")";
+        console.log(color);
+        return color
+    }
     function clear() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
@@ -164,16 +216,26 @@ window.onload = function() {
 
     // Draw everything
     var render = function () {
-        // bg
+
+        // BACKGROUND
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // SUN
-        ctx.beginPath();
-        ctx.arc(canvas.width / 2, canvas.height / 2, 20, 0, Math.PI*2);
-        ctx.fillStyle = "lightyellow";
-        ctx.fill();
-        ctx.closePath();
+        // STARS
+        for (x in bg_layer1) {
+            ctx.fillStyle = bg_layer1[x].color;
+            ctx.beginPath();
+            ctx.arc(bg_layer1[x].x, bg_layer1[x].y, bg_layer1[x].size, 0, Math.PI*2);
+            ctx.fill();
+            ctx.closePath();
+        }
+        for (x in bg_layer2) {
+            ctx.fillStyle = bg_layer2[x].color;
+            ctx.beginPath();
+            ctx.arc(bg_layer2[x].x, bg_layer2[x].y, bg_layer2[x].size, 0, Math.PI*2);
+            ctx.fill();
+            ctx.closePath();
+        }
 
         // PLANETS
         for (x in planet_ls) {
@@ -181,15 +243,11 @@ window.onload = function() {
             ctx.fillStyle = planet_ls[x].color;
             ctx.beginPath();
             ctx.arc(planet_ls[x].x, planet_ls[x].y, planet_ls[x].size, 0, Math.PI*2);
-            ctx.fillStyle = planet_ls[x].color;
             ctx.fill();
             ctx.closePath();
-
-            // draw path
-            
-            
+            // draw tail
             for (let y = planet_ls[x].path.length - 2; y >= 0; y--){
-                ctx.strokeStyle = 'rgba(255, 255, 255, ' + (y / planet_ls[x].path.length / 2) + ')';
+                ctx.strokeStyle = "rgba" + planet_ls[x].color.slice(3, -1) +  ", " + (y / planet_ls[x].path.length / 2) + ')';
                 ctx.lineWidth = (y / planet_ls[x].path.length)*planet_ls[x].size*2;
                 ctx.beginPath();
                 ctx.moveTo(planet_ls[x].path[y+1][0], planet_ls[x].path[y+1][1]);
@@ -199,8 +257,14 @@ window.onload = function() {
             
         }
 
-        // Score
-        
+        // SUN
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2, canvas.height / 2, 20, 0, Math.PI*2);
+        ctx.fillStyle = "lightyellow";
+        ctx.fill();
+        ctx.closePath();
+
+        // TEXT
         ctx.fillStyle = "white";
         ctx.font = "18px Helvetica";
         ctx.textAlign = "left";
@@ -236,5 +300,6 @@ window.onload = function() {
     // Let's play this game!
     var then = Date.now();
     genPlanets(30);
+    genBG(1000);
     main();
 }
