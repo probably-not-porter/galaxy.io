@@ -216,7 +216,7 @@ window.onload = function() {
 
     // Draw everything
     var render = function () {
-
+        ctx.shadowBlur = 0;
         // BACKGROUND
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -258,9 +258,11 @@ window.onload = function() {
         }
 
         // SUN
+        ctx.shadowBlur = 50;
+        ctx.shadowColor = "white";
         ctx.beginPath();
-        ctx.arc(canvas.width / 2, canvas.height / 2, 20, 0, Math.PI*2);
-        ctx.fillStyle = "lightyellow";
+        ctx.arc(canvas.width / 2, canvas.height / 2, 15, 0, Math.PI*2);
+        ctx.fillStyle = "rgba(238, 238, 215, 1)";
         ctx.fill();
         ctx.closePath();
 
@@ -300,6 +302,6 @@ window.onload = function() {
     // Let's play this game!
     var then = Date.now();
     genPlanets(30);
-    genBG(1000);
+    genBG(800);
     main();
 }
