@@ -35,6 +35,7 @@ window.onload = function() {
     var planet_ls = []; // keep track of all existing planets
     var bg_layer1 = []; // keep track of all background stars
     var bg_layer2 = []; // keep track of all background stars
+    var explosions = []; // keep track of explosions
     
     // ------------------------ EVENTS ------------------------
     document.addEventListener('keydown', function(event) {
@@ -156,7 +157,7 @@ window.onload = function() {
                 path: [],
                 xvel: Math.random()*1 - 0.5,
                 yvel: Math.random()*1 - 0.5,
-                mass: Math.random()*100,
+                mass: Math.random()*50 + 50,
                 size: Math.random()*8,
                 color: planetColor()
             };
@@ -164,14 +165,7 @@ window.onload = function() {
         }
     }
     function movePlanet(p){
-        let dist = Math.sqrt( Math.abs(p.x - canvas.width / 2)**2 + Math.abs(p.y - canvas.height / 2)**2);
-        let dist_y = Math.abs(p.y - canvas.height / 2);
-        let dist_x = Math.abs(p.x - canvas.width / 2);
-
         // Compute the distance of the other body.
-        //sx, sy = self_x, self_y
-        //ox, oy = screen_width / 2, screen_height / 2
-        20
         let dx = ((canvas.width / 2) - p.x)
         let dy = ((canvas.height / 2) - p.y)
         let d = Math.sqrt(dx**2 + dy**2)
@@ -194,8 +188,22 @@ window.onload = function() {
         if (p.path.length > trail_max){
             p.path.shift();
         }
-        p.x += p.xvel;
-        p.y += p.yvel;
+        p.x -= p.xvel;
+        p.y -= p.yvel;
+        if ( ((canvas.width / 2) - 15 < p.x && p.x < (canvas.width / 2) + 15) && ((canvas.height / 2) - 15 < p.y && p.y < (canvas.height / 2) + 15) )
+        {
+            createExplosion(p.x, p.y);
+            let i = planet_ls.indexOf(p);
+            planet_ls.splice(i, 1);
+        }
+    }
+    function createExplosion(x,y){
+        let boom = {
+            x: x,
+            y: y,
+            size: 10
+        };
+        explosions.push(boom);
     }
     // ------------------------ UTIL FUNCTIONS ------------------------
     function planetColor(){
@@ -257,6 +265,15 @@ window.onload = function() {
             
         }
 
+        // EXPLOSIONS
+        for (x in explosions) {
+            ctx.fillStyle = "rgba(243, 135, 68," + 3/explosions[x].size + ")";
+            ctx.beginPath();
+            ctx.arc(explosions[x].x, explosions[x].y, explosions[x].size, 0, Math.PI*2);
+            ctx.fill();
+            ctx.closePath();
+        }
+
         // SUN
         ctx.shadowBlur = 50;
         ctx.shadowColor = "white";
@@ -288,6 +305,12 @@ window.onload = function() {
 
         for (x in planet_ls){ // update planet positions
             movePlanet(planet_ls[x]);
+        }
+        for (x in explosions){
+            explosions[x].size += 3;
+            if (explosions[x].size > 40){
+                explosions.splice(x, 1);
+            }
         }
 
 
