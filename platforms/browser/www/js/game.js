@@ -16,9 +16,7 @@ window.onload = function() {
     bgImage.src = "images/background.png";
 
     // ------------------------ VARS ------------------------
-
-    // Movement related
-    var speed = 10;
+    var score = 0;
     var skew = {
         left: false,
         right: false,
@@ -30,8 +28,12 @@ window.onload = function() {
         y: 0
     };
 
+    // SETTINGS
     var trail_max = 100;
+    var speed = 10;
+    var sun_mass = 500;
 
+    // OBJ STORAGE
     var planet_ls = []; // keep track of all existing planets
     var bg_layer1 = []; // keep track of all background stars
     var bg_layer2 = []; // keep track of all background stars
@@ -175,7 +177,7 @@ window.onload = function() {
         }
 
         // Compute the force of attraction
-        let force = 9.8 * 1 * p.mass * 1 / (d**2)
+        let force = 0.0098 * 1 * p.mass * sun_mass / (d**2)
 
         // Compute the direction of the force.
         let theta = Math.atan2(dy, dx);
@@ -192,9 +194,12 @@ window.onload = function() {
         p.y -= p.yvel;
         if ( ((canvas.width / 2) - 15 < p.x && p.x < (canvas.width / 2) + 15) && ((canvas.height / 2) - 15 < p.y && p.y < (canvas.height / 2) + 15) )
         {
+            // collision with sun
             createExplosion(p.x, p.y);
             let i = planet_ls.indexOf(p);
             planet_ls.splice(i, 1);
+
+            score += 10;
         }
     }
     function createExplosion(x,y){
@@ -285,10 +290,14 @@ window.onload = function() {
 
         // TEXT
         ctx.fillStyle = "white";
-        ctx.font = "18px Helvetica";
-        ctx.textAlign = "left";
+        ctx.font = "12px Helvetica";
+        ctx.textAlign = "right";
         ctx.textBaseline = "top";
-        ctx.fillText("X: " + pos.x + ", Y: " + pos.y, 10, 10); 
+        ctx.fillText("X: " + pos.x + ", Y: " + pos.y, canvas.width - 10, 10); 
+
+        ctx.textAlign = "left";
+        ctx.font = "30px Helvetica";
+        ctx.fillText(score, 10, 10); 
     };
 
     // ------------------------ MAIN LOOP ------------------------
