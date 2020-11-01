@@ -32,6 +32,7 @@ window.onload = function() {
     var trail_max = 100;
     var speed = 10;
     var sun_mass = 500;
+    var sun_rad = 10;
 
     // OBJ STORAGE
     var planet_ls = []; // keep track of all existing planets
@@ -192,7 +193,7 @@ window.onload = function() {
         }
         p.x -= p.xvel;
         p.y -= p.yvel;
-        if ( ((canvas.width / 2) - 15 < p.x && p.x < (canvas.width / 2) + 15) && ((canvas.height / 2) - 15 < p.y && p.y < (canvas.height / 2) + 15) )
+        if ( ((canvas.width / 2) - sun_rad < p.x && p.x < (canvas.width / 2) + sun_rad) && ((canvas.height / 2) - sun_rad < p.y && p.y < (canvas.height / 2) + sun_rad) )
         {
             // collision with sun
             createExplosion(p.x, p.y);
@@ -200,6 +201,8 @@ window.onload = function() {
             planet_ls.splice(i, 1);
 
             score += 10;
+            sun_mass += p.mass * 2;
+            sun_rad += 3;
         }
     }
     function createExplosion(x,y){
@@ -283,7 +286,7 @@ window.onload = function() {
         ctx.shadowBlur = 50;
         ctx.shadowColor = "white";
         ctx.beginPath();
-        ctx.arc(canvas.width / 2, canvas.height / 2, 15, 0, Math.PI*2);
+        ctx.arc(canvas.width / 2, canvas.height / 2, sun_rad, 0, Math.PI*2);
         ctx.fillStyle = "rgba(238, 238, 215, 1)";
         ctx.fill();
         ctx.closePath();
