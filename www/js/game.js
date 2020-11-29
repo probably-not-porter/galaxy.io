@@ -191,8 +191,8 @@ window.onload = function() {
         if (p.path.length > trail_max){
             p.path.shift();
         }
-        p.x -= p.xvel;
-        p.y -= p.yvel;
+        p.x += p.xvel;
+        p.y += p.yvel;
         if ( ((canvas.width / 2) - sun_rad < p.x && p.x < (canvas.width / 2) + sun_rad) && ((canvas.height / 2) - sun_rad < p.y && p.y < (canvas.height / 2) + sun_rad) )
         {
             // collision with sun
@@ -336,7 +336,7 @@ window.onload = function() {
 
     // Let's play this game!
     var then = Date.now();
-    genPlanets(30);
-    genBG(800);
+    genPlanets(15);
+    //genBG(800);
     main();
 }
